@@ -1,6 +1,6 @@
 import java.math.BigInteger;
-
-// 分数クラス
+// 次回　和差積商
+/* 有理数クラス */
 public class Rational {
     private BigInteger numerator;   // 分子
     private BigInteger denominator; // 分母
@@ -44,6 +44,12 @@ public class Rational {
 		this.denominator = new BigInteger(d.toString());
 	}
 
+    // 引数を指定しない場合のコンストラクタ
+    public Rational(){
+        this.numerator = null;
+        this.denominator = null;
+    }
+
     // ゲッター・セッター
     public BigInteger getNumerator(){
         return this.numerator;
@@ -53,7 +59,11 @@ public class Rational {
         return this.denominator;
     }
 
-    public String getRational(){
+    public Rational getRational(){
+        return this;
+    }
+
+    public String getRationalToString(){
         return this.numerator.toString() + "/" + this.denominator.toString();
     }
 
@@ -115,5 +125,70 @@ public class Rational {
         Integer d = Integer.valueOf(denominator);
 		this.numerator = new BigInteger(n.toString());
 		this.denominator = new BigInteger(d.toString());
+    }
+
+    // 同値かどうか判定するメソッド
+    public boolean equals(Rational b){
+        if(this.numerator.equals(b.numerator) && this.denominator.equals(b.denominator)){   // 分子と分母どちらも等しければ
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 約分をするメソッド
+    public void ReduceAFraction(){
+        BigInteger gcd = this.numerator.gcd(this.denominator);  // 分母と分子の最大公約数
+        // 分母と分子を最大公約数で割る
+        this.numerator = this.numerator.divide(gcd); 
+        this.denominator = this.denominator.divide(gcd);
+    }
+
+    // 逆数にするメソッド
+    public Rational inv(){
+        Rational b = new Rational();
+        // 分子と分母を入れ替える
+        b.numerator = this.denominator; 
+        b.denominator = this.numerator;
+        return b;
+    }
+
+    public Rational add(Rational b){
+        BigInteger gcd = this.denominator.gcd(b.denominator);   // 分母の最大公約数
+        BigInteger lcm = (this.denominator.multiply(b.denominator)).divide(gcd);    // 分母の最小公倍数
+        // 通分した時に分子にかけられる数
+        BigInteger times1 = b.denominator.divide(gcd);   
+        BigInteger times2 = this.denominator.divide(gcd);
+
+        Rational c = new Rational();
+        // 通分
+        c.denominator = lcm;
+        c.numerator = (this.numerator.multiply(times1)).add(b.numerator.multiply(times2));
+        c.ReduceAFraction();    // 約分
+        return c;
+    }
+
+    // 引き算をするメソッド
+    public Rational minus(Rational b){
+        Rational c = new Rational(b.numerator.negate(),b.denominator);
+        return this.add(c); // a - b = a + (-b)
+    }
+
+    // 掛け算をするメソッド
+    public Rational multiply(Rational b){
+        Rational c = new Rational();
+        // あらかじめ約分できるものはしておく
+        this.ReduceAFraction();
+        b.ReduceAFraction();
+        // 分子同士、分母同士掛け算
+        c.numerator = this.numerator.multiply(b.numerator);
+        c.denominator = this.denominator.multiply(b.denominator);
+        c.ReduceAFraction();    // 約分
+        return c;
+    }
+
+    // 割り算をするメソッド
+    public Rational divide(Rational b){
+        return this.multiply(b.inv());  // a / b = a * (1/b)
     }
 }
