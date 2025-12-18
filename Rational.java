@@ -1,5 +1,5 @@
 import java.math.BigInteger;
-// 次回　和差積商
+
 /* 有理数クラス */
 public class Rational {
     private BigInteger numerator;   // 分子
@@ -51,23 +51,27 @@ public class Rational {
     }
 
     // ゲッター・セッター
+    // 分子を返す
     public BigInteger getNumerator(){
         return this.numerator;
     }
 
+    // 分母を返す
     public BigInteger getDenominator(){
         return this.denominator;
     }
 
+    // 自身を返す
     public Rational getRational(){
         return this;
     }
 
+    // 自身の情報を文字列に変換して返す
     public String getRationalToString(){
         return this.numerator.toString() + "/" + this.denominator.toString();
     }
 
-    // BigInteger版セッター
+    // BigInteger版セッター（分子のみ）
     public void setNumerator(BigInteger numerator){
         if (numerator == null) {
 			throw new IllegalArgumentException("分子はnullにできません.");
@@ -75,13 +79,13 @@ public class Rational {
         this.numerator = numerator;
     }
 
-    // Int版セッター
+    // Int版セッター（分子のみ）
     public void setNumerator(int numerator){
         Integer n = Integer.valueOf(numerator);
         this.numerator = new BigInteger(n.toString());
     }
 
-    // BigInteger版セッター
+    // BigInteger版セッター（分母のみ）
     public void setDenominator(BigInteger denominator){
         if (denominator == null) {
 			throw new IllegalArgumentException("分母はnullにできません.");
@@ -92,7 +96,7 @@ public class Rational {
 		this.denominator = denominator;
     }
 
-    // int版セッター
+    // int版セッター（分母のみ）
     public void setDenominator(int denominator){
         if (denominator == 0) {
 			throw new IllegalArgumentException("分母は0にできません.");
@@ -101,7 +105,7 @@ public class Rational {
 		this.denominator = new BigInteger(d.toString());
     }
 
-    // BigInteger版セッター
+    // BigInteger版セッター（分数全体）
     public void setRational(BigInteger numerator, BigInteger denominator){
         if (denominator == null) {
 			throw new IllegalArgumentException("分母はnullにできません.");
@@ -116,7 +120,7 @@ public class Rational {
 		this.denominator = denominator;   
     }
 
-    // int版セッター
+    // int版セッター（分数全体）
     public void setRational(int numerator, int denominator){
         if (denominator == 0) {
 			throw new IllegalArgumentException("分母は0にできません.");
@@ -137,11 +141,15 @@ public class Rational {
     }
 
     // 約分をするメソッド
-    public void ReduceAFraction(){
+    public void Standardization(){
         BigInteger gcd = this.numerator.gcd(this.denominator);  // 分母と分子の最大公約数
         // 分母と分子を最大公約数で割る
         this.numerator = this.numerator.divide(gcd); 
         this.denominator = this.denominator.divide(gcd);
+        if(this.denominator.compareTo(BigInteger.valueOf(0)) < 0){
+            this.denominator = this.denominator.negate();
+            this.numerator = this.numerator.negate();
+        }
     }
 
     // 逆数にするメソッド
@@ -153,6 +161,7 @@ public class Rational {
         return b;
     }
 
+    // 足し算をするメソッド
     public Rational add(Rational b){
         BigInteger gcd = this.denominator.gcd(b.denominator);   // 分母の最大公約数
         BigInteger lcm = (this.denominator.multiply(b.denominator)).divide(gcd);    // 分母の最小公倍数
@@ -164,7 +173,7 @@ public class Rational {
         // 通分
         c.denominator = lcm;
         c.numerator = (this.numerator.multiply(times1)).add(b.numerator.multiply(times2));
-        c.ReduceAFraction();    // 約分
+        c.Standardization();    // 約分
         return c;
     }
 
@@ -178,12 +187,12 @@ public class Rational {
     public Rational multiply(Rational b){
         Rational c = new Rational();
         // あらかじめ約分できるものはしておく
-        this.ReduceAFraction();
-        b.ReduceAFraction();
+        this.Standardization();
+        b.Standardization();
         // 分子同士、分母同士掛け算
         c.numerator = this.numerator.multiply(b.numerator);
         c.denominator = this.denominator.multiply(b.denominator);
-        c.ReduceAFraction();    // 約分
+        c.Standardization();    // 約分
         return c;
     }
 
